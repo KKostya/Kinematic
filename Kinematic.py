@@ -1,3 +1,7 @@
+
+# Copyright (c) 2018 Kanishchev Konstantin.
+# All rights reserved.
+
 import numpy as np
 
 class Particle(object):

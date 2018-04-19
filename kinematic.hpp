@@ -1,3 +1,7 @@
+
+// Copyright (c) 2018 Kanishchev Konstantin.
+// All rights reserved.
+
 #include <cmath>
 #include <vector>
 #include <algorithm>
