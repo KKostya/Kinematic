@@ -19,6 +19,7 @@ class KinematicProvider<double>
     double energy, kinetic;
 
 public:
+    double beta() { return momentum / E(); }
     double p(){ return momentum; }
     double R(){ return momentum / charge; }
     double Ekn(){ return Ek() / nucleons; }    
@@ -44,6 +45,7 @@ class KinematicProvider< std::vector<double> >
 {
     double mass;
     int charge, nucleons;
+    std::vector<double> velocity;    
     std::vector<double> momentum, rigidity;
     std::vector<double> energy, kinetic, kineticN;
 
@@ -57,6 +59,7 @@ class KinematicProvider< std::vector<double> >
     }
 
 public:
+
     std::vector<double> p(){ return momentum; }
     std::vector<double> R(){ 
         transform(momentum, rigidity, [this](double p){ return p / charge; });
@@ -78,6 +81,13 @@ public:
         transform( energy, kinetic, [this](double E){ return E - mass;} );
         return kinetic;
     }
+    std::vector<double> beta(){  
+        if(!velocity.empty()) return velocity;
+        if(energy.empty()) { E(); }
+        for(int i = 0; i < momentum.size(); i++) 
+            velocity.push_back(momentum[i] / energy[i]);
+        return velocity;
+    }
 
     KinematicProvider(double m, int q, int n, const std::vector<double> & p):
         mass(m), charge(q), nucleons(n), momentum(p)
@@ -85,6 +95,7 @@ public:
         energy = std::vector<double>(); 
         kinetic = std::vector<double>();
         rigidity = std::vector<double>();
+        velocity = std::vector<double>();        
     }
 };
 
@@ -100,6 +111,7 @@ class Particle
     ) {
         std::vector<double> out;
         std::transform(in.begin(), in.end(), std::back_inserter(out), f);
+        return out;
     }
 
 public:
@@ -126,7 +138,8 @@ public:
     // Vectorized
     
     KinematicProvider<std::vector<double> > p(const std::vector<double> & p) 
-        {   return KinematicProvider<std::vector<double> >(mass, charge, nucleons, p); }
+        {   
+            return KinematicProvider<std::vector<double> >(mass, charge, nucleons, p); }
 
     KinematicProvider<std::vector<double> > R(const std::vector<double> & R) 
     { 
